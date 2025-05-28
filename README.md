@@ -5,8 +5,10 @@
 
 ## 说明
 
-- 本应用基于 Vercel 生态的对话应用 [ai-chatbot](https://github.com/vercel/ai-chatbot) 和 [ai-sdk](https://github.com/vercel/ai) 构建，支持 Dify 对话和文件上传功能。
-> ai-chatbot 更新于 2025-05-25 的版本
+- 本项目基于 Vercel 生态的对话应用 [ai-chatbot](https://github.com/vercel/ai-chatbot) 和 [ai-sdk](https://github.com/vercel/ai) 构建，支持 Dify 对话和文件上传功能。
+  * ai-chatbot 更新于 2025-05-25 的版本
+  * 应用路由使用的函数是 'streamText'，所以调用 Dify 时 'response_mode: streaming'。
+  * 上传文件类型和大小限制需和 Dify 后台一致。
 
 - 部署流程见原项目 [README.md](https://github.com/iChuck-W/ai-chatbot-dify-provider/blob/main/README_EN.md)
 
@@ -38,6 +40,8 @@
 
 - [packages/provider/src/language-model/v1](https://github.com/vercel/ai/tree/main/packages/provider/src/language-model/v1)
 > 语言模型的核心接口，定义了模型必须实现的方法和属性，主要依赖于 @ai-sdk/provider 和 @ai-sdk/provider-utils
+
+- [streamText](https://ai-sdk.dev/docs/reference/ai-sdk-core/stream-text)
 
 - [community-providers](https://ai-sdk.dev/providers/community-providers)
   - [Qwen Provider](https://ai-sdk.dev/providers/community-providers/qwen)
