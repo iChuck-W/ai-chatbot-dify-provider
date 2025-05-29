@@ -14,8 +14,10 @@ import {
   getMessageCountByUserId,
   getMessagesByChatId,
   getStreamIdsByChatId,
+  getChatDifyConversationId,
   saveChat,
   saveMessages,
+  updateChatDifyConversationId,
 } from '@/lib/db/queries';
 import { generateUUID, getTrailingMessageId } from '@/lib/utils';
 import { generateTitleFromUserMessage } from '../../actions';
@@ -36,6 +38,7 @@ import { after } from 'next/server';
 import type { Chat } from '@/lib/db/schema';
 import { differenceInSeconds } from 'date-fns';
 import { ChatSDKError } from '@/lib/errors';
+import { conversationIdMap } from '@/lib/ai/dify/src/dify-chat-language-model';
 
 export const maxDuration = 120;
 
@@ -141,7 +144,7 @@ export async function POST(request: Request) {
       ],
     });
 
-    // 将 attachments 转换为符合 Dify 要求的格式
+    // Convert attachments to format required by Dify
     const difyFiles = message.experimental_attachments?.map(att => {
       const fileType = att.type || (
         att.contentType?.startsWith('image/') ? 'image' : 
@@ -170,6 +173,10 @@ export async function POST(request: Request) {
     // console.log('api/chat-dify/route.ts: difyFiles', JSON.stringify(difyFiles, null, 2));
     // console.log('api/chat-dify/route.ts: messages', JSON.stringify(messages).slice(0, 3000) || 'No content');
 
+    // Get Dify conversation_id
+    const dbConversationId = await getChatDifyConversationId({ chatId: id });
+    const difyConversationId = dbConversationId || undefined;
+
     const streamId = generateUUID();
     await createStreamId({ streamId, chatId: id });
 
@@ -180,9 +187,12 @@ export async function POST(request: Request) {
           system: systemPrompt({ selectedChatModel, requestHints }),
           messages,
           maxSteps: 5,
-          // 传递应用的用户 ID，作为  Dify 的 userId
+          // pass application user ID as Dify userId
+          // pass Dify conversationId to determine if it's a new conversation
           headers: {
             "userId": session.user.id,
+            "chatId": id,
+            "conversationId": difyConversationId,
           },
           experimental_providerMetadata: {
             files: {
@@ -212,6 +222,16 @@ export async function POST(request: Request) {
           onFinish: async ({ response }) => {
             if (session.user?.id) {
               try {
+                const conversationId = conversationIdMap.get(id);
+                
+                if (conversationId) {
+                  await updateChatDifyConversationId({
+                    chatId: id,
+                    difyConversationId: conversationId
+                  });
+                  console.log(`Saved Dify conversation_id ${conversationId} for chat ${id}`);
+                }
+                
                 const assistantId = getTrailingMessageId({
                   messages: response.messages.filter(
                     (message) => message.role === 'assistant',

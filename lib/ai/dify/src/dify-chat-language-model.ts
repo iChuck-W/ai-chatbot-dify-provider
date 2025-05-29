@@ -177,6 +177,9 @@ const difyStreamEventSchema = z
 
 type DifyStreamEvent = z.infer<typeof difyStreamEventSchema>;
 
+// To store the conversation_id and chat.id
+export const conversationIdMap = new Map<string, string>();
+
 export class DifyChatLanguageModel implements LanguageModelV1 {
   readonly specificationVersion = 'v1';
   readonly modelId: string;
@@ -228,8 +231,14 @@ export class DifyChatLanguageModel implements LanguageModelV1 {
     // If it's a continuing conversation, use the existing conversation ID from sessionManager
     const userMessages = prompt.filter(message => message.role === 'user');
     const assistantMessages = prompt.filter(message => message.role === 'assistant');
-    const isNewConversation = userMessages.length === 1 && assistantMessages.length === 0;
-    const finalConversationId = isNewConversation ? undefined : this.sessionManager.getConversationId();
+    const conversationId = headers?.['conversationId'] as string | undefined;
+    let finalConversationId = conversationId;
+    if (!finalConversationId) {
+      const isNewConversation = userMessages.length === 1 && assistantMessages.length === 0;
+      finalConversationId = isNewConversation ? undefined : this.sessionManager.getConversationId();
+    }
+    
+    // console.log(`dify-chat-language-model: headers conversationId=${conversationId}, finalConversationId=${finalConversationId}`);
     
     // Extract query text from the latest message
     let query = '';
@@ -405,6 +414,13 @@ export class DifyChatLanguageModel implements LanguageModelV1 {
               // Update session manager with conversation ID
               if (sessionManager) {
                 sessionManager.setConversationId(conversationId);
+              }
+
+              // save conversation_id to global map
+              const chatId = options.headers?.['chatId'] as string | undefined;
+              if (chatId) {
+                conversationIdMap.set(chatId, conversationId);
+                console.log(`Saved conversation_id ${conversationId} for chat ${chatId} in global map`);
               }
             }
             

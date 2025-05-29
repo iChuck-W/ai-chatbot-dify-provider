@@ -32,6 +32,10 @@
   * components/messages.tsx
   * components/multimodal-input.tsx
 
+- id 匹配，保证对话连续性
+  * pgTable('Chat') 扩展 difyConversationId 字段
+  * 应用 chatId 与 difyConversationId 匹配
+
 - 搜索 "// console.log"，去除备注符号运行，可以了解数据传递路径和字段。
 
 ## 参考资料

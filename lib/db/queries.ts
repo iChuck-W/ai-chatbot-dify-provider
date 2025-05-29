@@ -536,3 +536,42 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
     );
   }
 }
+
+/**
+ * Associate dify conversation_id and chat.id
+ */
+export async function getChatDifyConversationId({ chatId }: { chatId: string }) {
+  try {
+    const [chatRecord] = await db
+      .select({ difyConversationId: chat.difyConversationId })
+      .from(chat)
+      .where(eq(chat.id, chatId))
+      .limit(1);
+    
+    return chatRecord?.difyConversationId;
+  } catch (error) {
+    console.error('Failed to get Dify conversation ID:', error);
+    return undefined;
+  }
+}
+
+export async function updateChatDifyConversationId({
+  chatId,
+  difyConversationId,
+}: {
+  chatId: string;
+  difyConversationId: string;
+}) {
+  try {
+    await db
+      .update(chat)
+      .set({ difyConversationId })
+      .where(eq(chat.id, chatId));
+    
+    console.log(`Updated Dify conversation_id ${difyConversationId} for chat ${chatId}`);
+    return true;
+  } catch (error) {
+    console.error('Failed to update Dify conversation ID:', error);
+    return false;
+  }
+}
