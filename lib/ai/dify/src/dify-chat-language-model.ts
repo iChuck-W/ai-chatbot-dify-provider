@@ -419,8 +419,11 @@ export class DifyChatLanguageModel implements LanguageModelV1 {
               // save conversation_id to global map
               const chatId = options.headers?.['chatId'] as string | undefined;
               if (chatId) {
-                conversationIdMap.set(chatId, conversationId);
-                console.log(`Saved conversation_id ${conversationId} for chat ${chatId} in global map`);
+                const existingConversationId = conversationIdMap.get(chatId);
+                if (existingConversationId !== conversationId) {
+                  conversationIdMap.set(chatId, conversationId);
+                  console.log(`Updated conversation_id ${conversationId} for chat ${chatId} in global map`);
+                }
               }
             }
             
