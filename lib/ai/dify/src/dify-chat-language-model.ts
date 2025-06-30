@@ -9,7 +9,7 @@ import {
   type LanguageModelV1CallOptions,
 } from '@ai-sdk/provider';
 import {
-  FetchFunction,
+  type FetchFunction,
   combineHeaders,
   createEventSourceResponseHandler,
   createJsonErrorResponseHandler,
@@ -231,7 +231,7 @@ export class DifyChatLanguageModel implements LanguageModelV1 {
     // If it's a continuing conversation, use the existing conversation ID from sessionManager
     const userMessages = prompt.filter(message => message.role === 'user');
     const assistantMessages = prompt.filter(message => message.role === 'assistant');
-    const conversationId = headers?.['conversationId'] as string | undefined;
+    const conversationId = headers?.conversationId as string | undefined;
     let finalConversationId = conversationId;
     if (!finalConversationId) {
       const isNewConversation = userMessages.length === 1 && assistantMessages.length === 0;
@@ -260,7 +260,7 @@ export class DifyChatLanguageModel implements LanguageModelV1 {
     }
     
     // Get user ID from request headers, using userId as the identifier
-    const userId = headers?.['userId'];
+    const userId = headers?.userId;
     
     // Extract files directly from providerMetadata
     const files = providerMetadata?.files?.attachments ?? [];
@@ -417,7 +417,7 @@ export class DifyChatLanguageModel implements LanguageModelV1 {
               }
 
               // save conversation_id to global map
-              const chatId = options.headers?.['chatId'] as string | undefined;
+              const chatId = options.headers?.chatId as string | undefined;
               if (chatId) {
                 const existingConversationId = conversationIdMap.get(chatId);
                 if (existingConversationId !== conversationId) {

@@ -1,8 +1,8 @@
 import { 
-  FetchFunction, 
+  type FetchFunction, 
   loadApiKey
 } from "@ai-sdk/provider-utils";
-import { 
+import type { 
   DifyChatSettings, 
   DifyChatModelId
 } from "./dify-chat-settings";

@@ -20,7 +20,7 @@ const mockFetch: FetchFunction = async (input: RequestInfo | URL, init?: Request
   
   // Mock successful response for chat-messages endpoint
   if (url.includes('/chat-messages')) {
-    if (init?.headers && (init.headers as any)['Accept'] === 'text/event-stream') {
+    if (init?.headers && (init.headers as any).Accept === 'text/event-stream') {
       const encoder = new TextEncoder();
       const stream = new ReadableStream({
         start(controller) {
@@ -57,7 +57,7 @@ const mockFetch: FetchFunction = async (input: RequestInfo | URL, init?: Request
 };
 
 // Create a mock config
-const createMockConfig = (apiKey: string = 'test-api-key') => {
+const createMockConfig = (apiKey = 'test-api-key') => {
   return {
     provider: 'dify',
     baseURL: 'https://api.dify.ai/v1',
