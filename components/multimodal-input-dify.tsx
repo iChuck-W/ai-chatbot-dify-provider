@@ -42,8 +42,8 @@ import {
 } from './ui/dropdown-menu';
 import { 
   MIME_TYPE_MAP,
-  DifyFileType, 
-  DifyTransferMethod,
+  type DifyFileType, 
+  type DifyTransferMethod,
   FileConfig
 } from '@/lib/ai/dify/src/dify-file-types-all';
 
@@ -369,6 +369,7 @@ function PureMultimodalInput({
                 attachment={attachment}
               />
               <button
+                type="button"
                 className="absolute top-0 right-0 bg-black/50 rounded-full p-1 text-white text-xs"
                 onClick={() => {
                   setAttachments((attachments) =>
